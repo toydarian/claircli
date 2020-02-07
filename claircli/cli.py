@@ -84,7 +84,8 @@ class ClairCli(object):
         parser.add_argument('-L', '--log-file', help='save log to file')
         parser.add_argument(
             '-d', '--debug', action='store_true', help='print more logs')
-        parser.add_argument('-H', '--http', help='use http to access the ragistry')
+        parser.add_argument(
+            '-s', '--scheme', choices=['http', 'https'], default='https', help='scheme to use to access registry')
         group = parser.add_mutually_exclusive_group()
         group.add_argument(
             '-l', '--local-ip', help='ip address of local host')
@@ -97,7 +98,7 @@ class ClairCli(object):
         parser.set_defaults(func=self.analyze_image)
         self.args = parser.parse_args()
         self.setup_logging()
-        self.scheme = 'http' if self.args.http else 'https'
+        self.scheme = self.args.scheme
 
     def setup_logging(self):
         logger = logging.getLogger('claircli')
