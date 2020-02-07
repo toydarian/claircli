@@ -85,7 +85,8 @@ class ClairCli(object):
         parser.add_argument(
             '-d', '--debug', action='store_true', help='print more logs')
         parser.add_argument(
-            '-s', '--scheme', choices=['http', 'https'], default='https', help='scheme to use to access registry')
+            '-s', '--scheme', choices=['http', 'https'], default='https',
+            help='scheme to use to access registry')
         group = parser.add_mutually_exclusive_group()
         group.add_argument(
             '-l', '--local-ip', help='ip address of local host')
@@ -137,7 +138,8 @@ class ClairCli(object):
         clair = Clair(args.clair)
         if args.white_list:
             args.white_list = WhiteList(args.white_list)
-        args.images = (Image(name, self.scheme, registry) for name in args.images)
+        args.images = (Image(name, self.scheme, registry)
+                       for name in args.images)
         stats = defaultdict(list)
         for index, image in enumerate(args.images, start=1):
             logger.info('{:*^60}'.format(index))
