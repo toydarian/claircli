@@ -8,6 +8,7 @@ import argparse
 import textwrap
 
 from requests import exceptions
+from collections import Iterable
 import colorlog
 import yaml
 
@@ -84,10 +85,10 @@ class ClairCli(object):
         parser.add_argument('-L', '--log-file', help='save log to file')
         parser.add_argument(
             '-d', '--debug', action='store_true', help='print more logs')
-        parser.add_argument('-i', '--insecure-registries', default=[],
-                            nargs='+', metavar='some.reg:port',
-                            action='append',
-                            help='scheme to use to access registry')
+        parser.add_argument('-i', '--insecure-registries',
+                            nargs='+', metavar='some.reg:port', type=str,
+                            help='list of registries that should be' +
+                                 ' accessed insecurely')
         group = parser.add_mutually_exclusive_group()
         group.add_argument(
             '-l', '--local-ip', help='ip address of local host')
@@ -100,7 +101,10 @@ class ClairCli(object):
         parser.set_defaults(func=self.analyze_image)
         self.args = parser.parse_args()
         self.setup_logging()
-        self.insec_regs = frozenset(self.args.insecure_registries)
+        if isinstance(self.args.insecure_registries, Iterable):
+            self.insec_regs = frozenset(self.args.insecure_registries)
+        else:
+            self.insec_regs = frozenset()
 
     def setup_logging(self):
         logger = logging.getLogger('claircli')
