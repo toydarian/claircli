@@ -19,6 +19,7 @@ from .__version__ import __version__
 
 
 logger = logging.getLogger(__name__)
+insecure_registries = None
 
 
 class ClairCli(object):
@@ -84,9 +85,10 @@ class ClairCli(object):
         parser.add_argument('-L', '--log-file', help='save log to file')
         parser.add_argument(
             '-d', '--debug', action='store_true', help='print more logs')
-        parser.add_argument(
-            '-s', '--scheme', choices=['http', 'https'], default='https',
-            help='scheme to use to access registry')
+        parser.add_argument('-i', '--insecure-registries', default=[],
+                            nargs='+', metavar='some.reg:port',
+                            action='append',
+                            help='scheme to use to access registry')
         group = parser.add_mutually_exclusive_group()
         group.add_argument(
             '-l', '--local-ip', help='ip address of local host')
@@ -99,7 +101,8 @@ class ClairCli(object):
         parser.set_defaults(func=self.analyze_image)
         self.args = parser.parse_args()
         self.setup_logging()
-        self.scheme = self.args.scheme
+        global insecure_registries
+        insecure_registries = set(self.args.insecure_registries)
 
     def setup_logging(self):
         logger = logging.getLogger('claircli')
@@ -122,7 +125,7 @@ class ClairCli(object):
         result = set()
         for pattern in images:
             reg, repo, tag = Image.parse_id(pattern)
-            registry = RemoteRegistry(reg, self.scheme)
+            registry = RemoteRegistry(reg)
             for name in registry.find_images(repo, tag):
                 result.add(name)
         return result
@@ -138,7 +141,7 @@ class ClairCli(object):
         clair = Clair(args.clair)
         if args.white_list:
             args.white_list = WhiteList(args.white_list)
-        args.images = (Image(name, self.scheme, registry)
+        args.images = (Image(name, registry)
                        for name in args.images)
         stats = defaultdict(list)
         for index, image in enumerate(args.images, start=1):

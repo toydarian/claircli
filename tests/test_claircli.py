@@ -102,7 +102,7 @@ class TestImage(ClairCmdTestBase):
     def test_manifest_local(self, mock_docker):
         mock_docker_client(mock_docker)
         registry = LocalRegistry('localhost')
-        image = Image(self.name, self.scheme, registry)
+        image = Image(self.name, registry)
         with open('tests/test_data/manifest.json') as file_:
             manifest = json.load(file_)
         self.assertEqual(image.manifest, manifest)
@@ -111,7 +111,7 @@ class TestImage(ClairCmdTestBase):
     def test_layers_local(self, mock_docker):
         mock_docker_client(mock_docker)
         registry = LocalRegistry('localhost')
-        image = Image(self.name, self.scheme, registry)
+        image = Image(self.name, registry)
         with open('tests/test_data/manifest.json') as file_:
             manifest = json.load(file_)
         self.assertEqual(image.layers, [e.replace(
@@ -159,7 +159,7 @@ class TestClair(ClairCmdTestBase):
         mock_docker_client(mock_docker)
         clair = Clair(self.clair_url)
         registry = LocalRegistry('localhost')
-        image = Image(self.name, self.scheme, registry)
+        image = Image(self.name, registry)
         responses.add(responses.DELETE, '%s/%s' %
                       (self.v1_analyze_url, image.layers[0]))
         layers = clair.analyze_image(image)
