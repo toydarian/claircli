@@ -18,7 +18,6 @@ from six.moves.BaseHTTPServer import HTTPServer
 
 from .http_handler import PathHTTPHandler, start_http_server
 from .utils import mkpdirs, request, request_and_check
-from .cli import insecure_registries
 
 DOCKER_HUP_REGISTRY = 'registry-1.docker.io'
 logger = logging.getLogger(__name__)
@@ -73,7 +72,7 @@ class RemoteRegistry(object):
     token_pattern = re.compile(r'Bearer realm="(?P<realm>[^"]+)".*'
                                r'service="(?P<service>[^"]+).*')
 
-    def __init__(self, domain):
+    def __init__(self, domain, insecure_registries=frozenset()):
         self.domain = domain
         self.scheme = 'http' if domain in insecure_registries else 'https'
         self.url = '{}://{}/v2/'.format(self. scheme, self.domain)

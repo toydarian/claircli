@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class Image(object):
 
-    def __init__(self, name, registry=None):
+    def __init__(self, name, registry=None, insec_regs=frozenset()):
         self.name = name
         self._layers = []
         self._manifest = None
@@ -25,7 +25,8 @@ class Image(object):
         if isinstance(registry, LocalRegistry):
             self.registry = registry
         else:
-            self.registry = RemoteRegistry(reg)
+            self.registry = RemoteRegistry(reg,
+                                           insecure_registries=insec_regs)
 
     @classmethod
     def parse_id(cls, name):

@@ -19,7 +19,6 @@ from .__version__ import __version__
 
 
 logger = logging.getLogger(__name__)
-insecure_registries = None
 
 
 class ClairCli(object):
@@ -101,8 +100,7 @@ class ClairCli(object):
         parser.set_defaults(func=self.analyze_image)
         self.args = parser.parse_args()
         self.setup_logging()
-        global insecure_registries
-        insecure_registries = set(self.args.insecure_registries)
+        self.insec_regs = frozenset(self.args.insecure_registries)
 
     def setup_logging(self):
         logger = logging.getLogger('claircli')
@@ -125,7 +123,7 @@ class ClairCli(object):
         result = set()
         for pattern in images:
             reg, repo, tag = Image.parse_id(pattern)
-            registry = RemoteRegistry(reg)
+            registry = RemoteRegistry(reg, insecure_registries=self.insec_regs)
             for name in registry.find_images(repo, tag):
                 result.add(name)
         return result
