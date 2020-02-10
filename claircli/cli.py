@@ -143,7 +143,7 @@ class ClairCli(object):
         clair = Clair(args.clair)
         if args.white_list:
             args.white_list = WhiteList(args.white_list)
-        args.images = (Image(name, registry)
+        args.images = (Image(name, registry, insec_regs=self.insec_regs)
                        for name in args.images)
         stats = defaultdict(list)
         for index, image in enumerate(args.images, start=1):
